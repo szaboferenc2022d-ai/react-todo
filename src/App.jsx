@@ -16,9 +16,15 @@ function App(props) {
   const [filter, setFilter] = useState("All");
 
   function addTask(name) {
+    const normalizedName = name.trim();
+
+    if (!normalizedName || normalizedName.toLowerCase().includes("react")) {
+      return;
+    }
+
     setTasks((prevTasks) => [
       ...prevTasks,
-      { id: `todo-${Date.now()}`, name, completed: false },
+      { id: `todo-${Date.now()}`, name: normalizedName, completed: false },
     ]);
   }
 

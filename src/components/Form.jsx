@@ -2,15 +2,23 @@ import { useState } from "react";
 
 function Form({ addTask }) {
   const [name, setName] = useState("");
+  const [error, setError] = useState("");
 
   function handleSubmit(event) {
     event.preventDefault();
     const trimmedName = name.trim();
 
     if (!trimmedName) {
+      setError("A feladat mező nem lehet üres.");
       return;
     }
 
+    if (trimmedName.toLowerCase().includes("react")) {
+      setError("A feladat nem tartalmazhatja a 'react' szót.");
+      return;
+    }
+
+    setError("");
     addTask(trimmedName);
     setName("");
   }
@@ -29,8 +37,18 @@ function Form({ addTask }) {
         name="text"
         autoComplete="off"
         value={name}
-        onChange={(event) => setName(event.target.value)}
+        onChange={(event) => {
+          setName(event.target.value);
+          if (error) {
+            setError("");
+          }
+        }}
       />
+      {error && (
+        <p role="alert" style={{ color: "crimson", marginTop: "0.5rem" }}>
+          {error}
+        </p>
+      )}
       <button type="submit" className="btn btn__primary btn__lg">
         Add
       </button>
