@@ -15,7 +15,7 @@ function App(props) {
   const [tasks, setTasks] = useState(() => {
     try {
       const savedTasks = JSON.parse(localStorage.getItem("tasks"));
-      if (Array.isArray(savedTasks) && savedTasks.length > 0) {
+      if (Array.isArray(savedTasks) && savedTasks.length >= 0) {
         return savedTasks;
       }
     } catch (error) {
@@ -39,7 +39,7 @@ function App(props) {
 
     setTasks((prevTasks) => [
       ...prevTasks,
-      { id: `todo-${Date.now()}`, name: normalizedName, completed: false },
+      { id: `todo-${Date.now()}`, name: normalizedName, completed: false, value: 1 },
     ]);
   }
 
@@ -70,6 +70,12 @@ function App(props) {
     setTasks(editedTaskList);
   }
 
+  function updateTaskValue(id, value) {
+    setTasks((prevTasks) =>
+      prevTasks.map((task) => (task.id === id ? { ...task, value } : task)),
+    );
+  }
+
   const taskList = tasks
     .filter(FILTER_MAP[filter])
     .map((task) => (
@@ -77,10 +83,12 @@ function App(props) {
         id={task.id}
         name={task.name}
         completed={task.completed}
+        value={task.value ?? 0}
         key={task.id}
         toggleTaskCompleted={toggleTaskCompleted}
         deleteTask={deleteTask}
         editTask={editTask}
+        updateTaskValue={updateTaskValue}
       />
     ));
 

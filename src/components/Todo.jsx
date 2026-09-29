@@ -1,8 +1,15 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-function Todo({ id, name, completed, toggleTaskCompleted, deleteTask, editTask }) {
+function Todo({ id, name, completed, value = 0, toggleTaskCompleted, deleteTask, editTask, updateTaskValue }) {
   const [isEditing, setIsEditing] = useState(false);
   const [newName, setNewName] = useState(name);
+  const editFieldRef = useRef(null);
+
+  useEffect(() => {
+    if (isEditing) {
+      editFieldRef.current?.focus();
+    }
+  }, [isEditing]);
 
   function handleSubmit(event) {
     event.preventDefault();
@@ -14,6 +21,10 @@ function Todo({ id, name, completed, toggleTaskCompleted, deleteTask, editTask }
 
     editTask(id, trimmedName);
     setIsEditing(false);
+  }
+
+  function changeValue(amount) {
+    updateTaskValue(id, Math.max(1, value + amount));
   }
 
   return (
@@ -30,6 +41,7 @@ function Todo({ id, name, completed, toggleTaskCompleted, deleteTask, editTask }
               type="text"
               value={newName}
               onChange={(event) => setNewName(event.target.value)}
+              ref={editFieldRef}
             />
           </div>
           <div className="btn-group">
@@ -50,16 +62,30 @@ function Todo({ id, name, completed, toggleTaskCompleted, deleteTask, editTask }
         </form>
       ) : (
         <>
-          <div className="c-cb">
-            <input
-              id={id}
-              type="checkbox"
-              checked={completed}
-              onChange={() => toggleTaskCompleted(id)}
-            />
-            <label className="todo-label" htmlFor={id}>
-              {name}
-            </label>
+          <div className="todo-content">
+            <div className="c-cb">
+              <input
+                id={id}
+                type="checkbox"
+                checked={completed}
+                onChange={() => toggleTaskCompleted(id)}
+              />
+              <label className="todo-label" htmlFor={id}>
+                {name}
+              </label>
+            </div>
+            <div className="todo-counter">
+              <label className="visually-hidden" htmlFor={`${id}-value`}>
+                {name} értéke
+              </label>
+              <p>fonotoság jelsző</p>
+              <input id={`${id}-value`} className="todo-number" type="number" min="1" max="10" value={value}
+                onChange={(event) => {
+                  const nextValue = event.target.valueAsNumber;
+                  updateTaskValue(id, Number.isFinite(nextValue) ? Math.max(0, Math.trunc(nextValue)) : 0,);
+                }}
+              />
+            </div>
           </div>
           <div className="btn-group">
             <button type="button" className="btn" onClick={() => setIsEditing(true)}>
